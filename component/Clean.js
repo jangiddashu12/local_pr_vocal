@@ -9,7 +9,7 @@ export default function Clean({navigation}) {
     return (
       <View style={{ flex:1}}>
           <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.08 }}>
-          <Header navigation={navigation} title={"Home"} dashboard={true} height={Scales.deviceHeight * 0.08} />
+          <Header navigation={navigation} noti={true} title={"Home"} dashboard={true} height={Scales.deviceHeight * 0.08} />
         </View>
         <View style={{flex:1, justifyContent:"center"}}> 
           <Text style={{alignSelf:"center"}}>Coming Soon!</Text>

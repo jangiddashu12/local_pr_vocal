@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { Button, View, Text, TextInput, CheckBox,AsyncStorage,BackHandler } from 'react-native';
+import { Button, View, Text, TextInput, CheckBox, AsyncStorage, BackHandler, PermissionsAndroid,ActivityIndicator } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 import IonicI from 'react-native-vector-icons/Ionicons'
 import PostFetch from '../ajax/PostFetch'
 import Toast from "react-native-simple-toast"
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import Geolocation from 'react-native-geolocation-service';
+import Modal from "react-native-modal"
 
-export default function CustomerSignup({ route,navigation }) {
+export default function CustomerSignup({ route, navigation }) {
     let [name, setName] = React.useState("")
     let [email, setemail] = React.useState("")
     let [no, setNo] = React.useState("")
@@ -20,13 +22,39 @@ export default function CustomerSignup({ route,navigation }) {
     let [address, setaddress] = React.useState("")
     let [pin, setPin] = React.useState("")
 
-    function SetAddressDetail(lat, long,city,add,pin){
-        setlat(lat)
-        setlong(long)
+    function SetAddressDetail(city, add, pin) {
+
         setcity(city)
         setaddress(add)
         setPin(pin)
-        console.log(address)
+        console.log(lat, long)
+    }
+
+    async function callLocation() {
+        //alert("callLocation Called");
+
+        Geolocation.getCurrentPosition(
+            //Will give you the current location
+            async (position) => {
+                // console.log(position, "pppositon")
+                const currentLongitude = (position.coords.longitude);
+                //getting the Longitude from the location json
+                const currentLatitude = (position.coords.latitude);
+
+                console.log(currentLatitude, currentLongitude, "{{{{{")
+
+                setlat(currentLatitude)
+                setlong(currentLongitude)
+
+                return currentLatitude
+            },
+            (error) => alert("error.message"),
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        );
+
+
+
+
     }
     async function UserRegister() {
         let headers = {
@@ -34,7 +62,7 @@ export default function CustomerSignup({ route,navigation }) {
             'Content-Type': 'application/json',
 
         };
-        if(email==""){
+        if (email == "") {
             Toast.showWithGravity("Enter a email address.", Toast.SHORT, Toast.BOTTOM);
             return 0;
         }
@@ -44,32 +72,32 @@ export default function CustomerSignup({ route,navigation }) {
             Toast.showWithGravity("Enter a valid email address.", Toast.SHORT, Toast.BOTTOM);
             return 0;
         }
-        if(name==""){
+        if (name == "") {
             Toast.showWithGravity("Enter a name .", Toast.SHORT, Toast.BOTTOM);
             return 0;
         }
-        if(no==""){
+        if (no == "") {
             Toast.showWithGravity("Enter a Mobile No.", Toast.SHORT, Toast.BOTTOM);
             return 0;
         }
-        if(pass==""){
+        if (pass == "") {
             Toast.showWithGravity("Enter a Password.", Toast.SHORT, Toast.BOTTOM);
             return 0;
         }
-        if(pass.length<=8){
+        if (pass.length <= 8) {
             Toast.showWithGravity("Please enter a password with atleast 8 characters", Toast.SHORT, Toast.BOTTOM);
             return 0;
         }
-        if(isSelected==""){
+        if (isSelected == "") {
             Toast.showWithGravity("Please accept the privacy.", Toast.SHORT, Toast.BOTTOM);
             return 0;
         }
-        if(city==""||address==""||pin==""){
+        if (city == "" || address == "" || pin == "") {
             Toast.showWithGravity("Addreses is not found.", Toast.SHORT, Toast.BOTTOM);
             return 0;
         }
 
-       
+
         let payload = {
             "address": address,
             "city": city,
@@ -84,37 +112,58 @@ export default function CustomerSignup({ route,navigation }) {
         }
         let url = "https://local-pe-vocal.in/api/customer/create"
         console.log(payload)
+        setLoading(true)
         const json = await PostFetch(url, payload, headers)
 
-        if(json!=null){
-            if(json.status==true){
+        if (json != null) {
+            if (json.status == true) {
                 await AsyncStorage.setItem("token", "avbsdivinsvonvown")
                 await AsyncStorage.setItem("id", JSON.stringify(json.data.id))
                 await AsyncStorage.setItem("user_data", JSON.stringify(json))
-              
-                navigation.navigate("AppCustomer", {"data":json})
+
+                navigation.navigate("AppCustomer", { "data": json })
             }
-            else{
+            else {
                 alert(json.message)
             }
         }
-        else{
+        else {
             // alert("Something went wrong")
         }
+        setLoading(false)
     }
-    function handleBackButtonClick(){
+    function handleBackButtonClick() {
         return true
     }
-    React.useEffect(()=>{
+    React.useEffect(async () => {
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
-    };
-    },[])
+
+        //Checking for the permission just after component loaded
+        if (Platform.OS === 'ios') {
+            callLocation(that);
+        } else {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
+                'title': 'Location Access Required',
+                'message': 'This App needs to Access your location'
+            }
+            )
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                // To Check, If Permission is granted
+                let position = await callLocation();
+
+
+            } else {
+                alert("Permission Denied");
+            }
+        }
+    }, [])
+    const [loading, setLoading] = React.useState(false)
+    console.log(lat, long)
     return (
         <View style={{ flex: 1 }}>
             <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
-                <Header navigation={navigation} title={"User Registration"} dashboard={false} height={Scales.deviceHeight * 0.08} />
+                <Header navigation={navigation} dashboard={false} title={"User Registration"} special={true} nav={"Login"} />
             </View>
             <View style={{ flex: 1 }}>
                 <View style={{ width: Scales.deviceWidth * 1.0, paddingTop: 25, height: Scales.deviceHeight * 0.70, }}>
@@ -149,7 +198,7 @@ export default function CustomerSignup({ route,navigation }) {
                             label="Password*"
                             onChangeText={(e) => { setpass(e) }}
                             enter_data={pass}
-                            secureTextEntry = {true}
+                            secureTextEntry={true}
 
                         />
                     </View>
@@ -158,12 +207,13 @@ export default function CustomerSignup({ route,navigation }) {
                             <FloatingLabelInput
                                 label="Address*"
                                 enter_data={address}
-                                value = {address}
-                               
+                                value={address}
+                                onChangeText={(e) => setaddress(e)}
+
 
                             />
                         </View>
-                        <TouchableOpacity onPress={()=>navigation.navigate("map",{"Setfunc":SetAddressDetail})}><View style={{ width: Scales.deviceWidth * 0.12, paddingTop: 10, height: Scales.deviceHeight * 0.10, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate("map", { "Setfunc": SetAddressDetail, "lat": lat, "long": long })}><View style={{ width: Scales.deviceWidth * 0.12, paddingTop: 10, height: Scales.deviceHeight * 0.10, }}>
                             <IonicI size={24} name="location" style={{ alignSelf: "flex-end" }} />
                         </View></TouchableOpacity>
                     </View>
@@ -183,11 +233,18 @@ export default function CustomerSignup({ route,navigation }) {
 
                 </View>
                 <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.20, flexDirection: "column-reverse" }}>
-                   <TouchableOpacity onPress={()=>UserRegister()}><View style={{ width: Scales.deviceWidth * 0.80, justifyContent: "center", borderRadius: Scales.deviceHeight * 0.04, height: Scales.deviceHeight * 0.07, backgroundColor: button_status ? "#e32e59" : '#cccccc', alignSelf: "center" }}>
+                    <TouchableOpacity onPress={() => UserRegister()}><View style={{ width: Scales.deviceWidth * 0.80, justifyContent: "center", borderRadius: Scales.deviceHeight * 0.04, height: Scales.deviceHeight * 0.07, backgroundColor: button_status ? "#e32e59" : '#cccccc', alignSelf: "center" }}>
                         <Text style={{ textAlign: "center", fontSize: Scales.moderateScale(18), color: button_status ? "#ffffff" : "#696969" }}>Register</Text>
                     </View></TouchableOpacity>
                 </View>
             </View>
+            <Modal isVisible={loading}>
+
+                <View style={{ flex: 1, justifyContent: "center" }}>
+                    <ActivityIndicator size={20} style={{ alignSelf: "center" }} />
+                </View>
+
+            </Modal>
         </View>
     )
 }
@@ -210,17 +267,27 @@ class FloatingLabelInput extends React.Component {
         this.setState({ focus: !this.state.focus })
 
     }
-    UNSAFE_componentWillReceiveProps=(props)=>{
-        // console.log(props)
-        if(this.props.enter_data.length!=0){
-            this.setState({ focus: !this.state.focus,isFocused:true })
+    UNSAFE_componentWillReceiveProps = (props) => {
+        // console.log(props.label)
+        if (props.label == "Address*") {
+            if (props.enter_data.length != 0) {
+                console.log(props)
+                if (!this.state.isFocused) {
+                    this.setState({ focus: !this.state.focus, isFocused: true })
+                }
+
+            }
+            else {
+                this.setState({ focus: !this.state.focus, isFocused: false })
+            }
         }
+
     }
 
 
 
     render() {
-        
+
         const { label, ...props } = this.props;
         const { isFocused } = this.state;
 
@@ -247,12 +314,12 @@ class FloatingLabelInput extends React.Component {
                 </Text>
                 <View style={view_style}>
                     <TextInput
-                        
+
                         {...props}
                         style={{ paddingLeft: 10, }}
                         onFocus={this.handleFocus}
                         onBlur={this.handleBlur}
-                    
+
                     />
 
                 </View>

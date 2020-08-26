@@ -19,6 +19,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Toast from 'react-native-simple-toast';
 import PostFetch from '../ajax/PostFetch'
 import { diff } from 'react-native-reanimated';
+import PreLoader from './Loader';
 
 export default function Pay({ route, navigation }) {
     async function GetData(ref = false) {
@@ -30,9 +31,10 @@ export default function Pay({ route, navigation }) {
         fetch(url)
             .then(resp => resp.json())
             .then((json) => {
+                console.log(json.data.wallet, "00000000000000000000")
                 if (json.status == true) {
                     setData(json.data)
-                    console.log(data.wallet_ledger)
+                    // console.log(data.wallet_ledger)
                 }
                 else {
                     alert(json.message)
@@ -54,11 +56,7 @@ export default function Pay({ route, navigation }) {
         setdesc(text)
     }
 
-    function MakePayment() {
-        if (amt < 100) {
-            Toast.showWithGravity("Enter more than 100", Toast.SHORT, Toast.BOTTOM);
-            return 0
-        }
+    async function MakePayment() {
         if (desc == "") {
             Toast.showWithGravity("Enter Descprition", Toast.SHORT, Toast.BOTTOM);
             return 0
@@ -67,7 +65,7 @@ export default function Pay({ route, navigation }) {
             description: desc,
             image: 'https://i.imgur.com/3g7nmJC.png',
             key: "rzp_test_4wgIHBPaYpaAac",
-            amount: diff_amnt * 100,
+            amount: (parseInt(amt) - parseInt(data.wallet.raw_balance)) * 100,
             currency: "INR",
             name: data.name,//Replace this with an order_id created using Orders API. Learn more at https://razorpay.com/docs/api/orders.
             prefill: {
@@ -77,56 +75,103 @@ export default function Pay({ route, navigation }) {
             },
             theme: { color: '#53a20e' }
         }
-        if(diff_amnt>0){
+        if (diff_amnt > 0) {
+            setLoading(true)
             RazorpayCheckout.open(options).then(async (data) => {
                 // handle success
                 let headers = {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-    
+
                 };
                 let send_id = await AsyncStorage.getItem("id")
                 console.log(data)
-                let payload = { "amount": diff_amnt, "transaction_id": data.razorpay_payment_id, "transaction_type": "Razerpay", "transaction_title": desc, "transaction_description": desc, "sender_id": send_id }
+                let payload = { "amount": diff_amnt, "transaction_id": data.razorpay_payment_id, "transaction_type": "Razerpay", "transaction_title": "Add Money", "transaction_description": desc, "sender_id": send_id }
                 let url = "https://local-pe-vocal.in/api/customer/wallet/addmoney/" + String(send_id)
                 console.log(payload)
                 const json = await PostFetch(url, payload, headers)
                 console.log(json)
                 if (json != null) {
                     if (json.status == true) {
-                        Toast.showWithGravity("Successfully", Toast.SHORT, Toast.BOTTOM);
+                        let payload = { "amount": amt, "transaction_id": "", "transaction_type": "Razerpay", "transaction_title": "Money send to Your Local pr Vocal Account to" + String(route.params.name), "transaction_description": desc, "sender_id": send_id }
+                        let url = "https://local-pe-vocal.in/api/customer/wallet/paymoney/" + String(send_id)
+                        parseInt(amt)
+                        const json = await PostFetch(url, payload, headers)
+                        console.log(json)
+                        if (json != null) {
+                            if (json.status == true) {
+                                setamt(0)
+                                setdesc("")
+                                GetData()
+                                Toast.showWithGravity("Successfully", Toast.SHORT, Toast.BOTTOM);
+                            }
+                            else {
+                                Toast.showWithGravity(json.message, Toast.SHORT, Toast.BOTTOM);
+                            }
+                        }
+                      
                     }
                     else {
                         Toast.showWithGravity(json.message, Toast.SHORT, Toast.BOTTOM);
                     }
+                    setLoading(false)
                 }
-    
+
             }).catch((error) => {
+                setLoading(false)
+                console.log(error)
                 // handle failure
                 Toast.showWithGravity(`Error: ${error.code} | ${error.description}`, Toast.SHORT, Toast.BOTTOM);
                 // alert(`Error: ${error.code} | ${error.description}`);
             });
 
         }
-        
+        else {
+            let headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+
+            };
+            setLoading(true)
+            let send_id = await AsyncStorage.getItem("id")
+            console.log(data)
+            let payload = { "amount": amt, "transaction_id": "", "transaction_type": "Razerpay", "transaction_title": "Money send to Your Local pr Vocal Account to" + String(route.params.name), "transaction_description": desc, "sender_id": send_id }
+            let url = "https://local-pe-vocal.in/api/customer/wallet/paymoney/" + String(send_id)
+            console.log(payload)
+            const json = await PostFetch(url, payload, headers)
+            console.log(json)
+            if (json != null) {
+                if (json.status == true) {
+                    Toast.showWithGravity("Successfully", Toast.SHORT, Toast.BOTTOM);
+                }
+                else {
+                    Toast.showWithGravity(json.message, Toast.SHORT, Toast.BOTTOM);
+                }
+            }
+            setLoading(false)
+
+
+        }
+
 
     }
     const [data, setData] = useState([])
     const [amt, setamt] = useState(0)
     const [desc, setdesc] = useState("")
+    let [loading, setLoading] = useState(false)
     let [refresh, setrefresh] = useState(false)
-    let wallet = data.wallet==undefined?0:data.wallet.raw_balance
-    let diff_amnt = parseInt(amt)-parseInt(wallet)
-    
-    let txt = diff_amnt>0? "Insufficent wallet Account Balance "+diff_amnt: "Available balance for payment "+wallet
-    
+    let wallet = data.wallet == undefined ? 0 : data.wallet.raw_balance
+    let diff_amnt = parseInt(amt) - parseInt(wallet)
+
+    let txt = diff_amnt > 0 ? "Insufficent wallet Account Balance " + diff_amnt : "Available balance for payment " + wallet
+
     return (
-        
+
         <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
             <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
                 <Header navigation={navigation} title={"Add Money"} size={18} dashboard={false} height={Scales.deviceHeight * 0.08} />
             </View>
-            <ScrollView refreshControl={<RefreshControl refreshing={refresh} onRefresh={() => GetData(true)} />} style={{ flex: 1 }}><View style={{ width: Scales.deviceWidth * 1.0, paddingTop: 30, paddingLeft: 30, paddingRight: 10, height: Scales.deviceHeight * 0.60, }}>
+            {!loading ? <ScrollView refreshControl={<RefreshControl refreshing={refresh} onRefresh={() => GetData(true)} />} style={{ flex: 1 }}><View style={{ width: Scales.deviceWidth * 1.0, paddingTop: 30, paddingLeft: 30, paddingRight: 10, height: Scales.deviceHeight * 0.60, }}>
                 <View style={{ width: Scales.deviceWidth * 0.80, height: Scales.deviceHeight * 0.06, }}>
                     <Text style={{ fontSize: Scales.moderateScale(18) }}>Pay money to {route.params.name}</Text>
                 </View>
@@ -145,11 +190,11 @@ export default function Pay({ route, navigation }) {
                     </View>
                     <View style={{ width: Scales.deviceWidth * 0.70, justifyContent: "flex-end", height: Scales.deviceHeight * 0.08, }}>
                         <TextInput placeholder={"What's this for ?"} onChangeText={(text) => EnterDesc(text)} style={{ fontWeight: "100", borderBottomWidth: 0.8, textAlignVertical: "bottom", fontSize: Scales.moderateScale(14) }} />
-                        <Text style={{fontSize:Scales.moderateScale(10),color:diff_amnt>0?"red":"#676767",paddingTop:3}}>{txt}</Text>
+                        <Text style={{ fontSize: Scales.moderateScale(10), color: diff_amnt > 0 ? "red" : "#676767", paddingTop: 3 }}>{txt}</Text>
                     </View>
                     <View style={{ width: Scales.deviceWidth * 0.70, justifyContent: "flex-end", height: Scales.deviceHeight * 0.09, }}>
                         <TouchableOpacity onPress={() => MakePayment()}><View style={{ width: Scales.deviceWidth * 0.50, alignSelf: "center", justifyContent: "center", height: Scales.deviceHeight * 0.06, borderRadius: 20, backgroundColor: "#e32e59" }}>
-                            <Text style={{ textAlign: "center", color: "#ffffff", fontSize: Scales.moderateScale(12) }}>{diff_amnt>0?"Add "+diff_amnt+" rupee to wallet":"Pay"}</Text>
+                            <Text style={{ textAlign: "center", color: "#ffffff", fontSize: Scales.moderateScale(12) }}>{diff_amnt > 0 ? "Add " + diff_amnt + " rupee to wallet" : "Pay"}</Text>
                         </View></TouchableOpacity>
                     </View>
 
@@ -171,7 +216,8 @@ export default function Pay({ route, navigation }) {
 
                     ></FlatList>
                 </View>
-            </ScrollView>
+
+            </ScrollView> : <PreLoader preLoaderVisible={loading} />}
 
         </View>
     )

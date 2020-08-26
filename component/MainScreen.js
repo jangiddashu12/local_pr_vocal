@@ -12,6 +12,7 @@ import {
 
 } from 'react-native';
 
+
 import { Scales } from "@common"
 
 
@@ -56,7 +57,7 @@ export default function MainScreen({ navigation }) {
           </View>
 
         </View>
-
+      
       </ImageBackground>
     </View>
   );

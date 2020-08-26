@@ -49,7 +49,8 @@ import Payment from "./component/Payment"
 import Address from "./component/AddressScreen"
 import AddMoney from "./component/AddMoneyScreen"
 import ScanScreen from "./component/ScannerQR"
-
+import NotificationScreen from "./component/NotificationScreen"
+import BusinessCustomerDetail from "./component/CustomerBusinessDetail"
 
 
 
@@ -75,6 +76,7 @@ const AuthStack = () => (
     <Auth.Screen name="SelectSubCategory" options={{ headerShown: false }} component={RegisterCatSub} />
     <Auth.Screen name="plan" options={{ headerShown: false }} component={Plans} />
     <Auth.Screen name="payment" options={{ headerShown: false }} component={Payment} />
+    <Auth.Screen name="businessdetail" options={{ headerShown: false }} component={BusinessCustomerDetail} />
 
 
   </Auth.Navigator>
@@ -131,6 +133,7 @@ function Main() {
         <RootStack.Screen name='StoreDetail' component={StoreDetail} />
         <RootStack.Screen name='pay' component={Pay} />
         <RootStack.Screen name='map' component={Map} />
+        <RootStack.Screen name='notification' component={NotificationScreen} />
         <RootStack.Screen name='ScanScreen' component={ScanScreen} />
         
       </RootStack.Navigator>

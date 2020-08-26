@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Header from "./Header"
 import IonicI from 'react-native-vector-icons/Ionicons'
-
+import Toast from "react-native-simple-toast"
 import { Scales } from "@common"
 import Category from "./CategoryScreen"
 
@@ -31,12 +31,37 @@ export default function Dashboard({ navigation }) {
       .catch((err) => console.log(err))
   }
 
+  async function Recharges() {
+    let url = "https://local-pe-vocal.in/api/recharge/services"
+    fetch(url)
+      .then((resp) => resp.json())
+      .then((json) => {
+        // console.log(json, "--json")
+        if (json.status == true) {
+          setRecharge(json.data)
+
+        }
+        else {
+          Toast.showWithGravity(json.message, Toast.SHORT, Toast.BOTTOM)
+        }
+      })
+      .catch((err) => console.log(err))
+  }
+
   async function getBaner() {
     fetch("https://local-pe-vocal.in/api/home/banner")
       .then((resp) => resp.json())
       .then((json) => {
-        setBanner(json.data)
-        return 0
+        if (json.status == true) {
+          setBanner(json.data)
+
+        }
+        else {
+          Toast.showWithGravity(json.message, Toast.SHORT, Toast.BOTTOM)
+
+        }
+
+
       })
       .catch((err) => console.log(err))
 
@@ -47,11 +72,13 @@ export default function Dashboard({ navigation }) {
 
     getBaner()
     GetCat()
+    Recharges()
     console.log("===useeffect=====")
 
   }, [])
   const [banner, setBanner] = useState([]);
   const [category, setcategory] = useState([]);
+  const [recharge, setRecharge] = useState([]);
   // console.log(navigation, "--nav")
 
   return (
@@ -59,10 +86,11 @@ export default function Dashboard({ navigation }) {
     <View style={{ flex: 1, }}>
 
       <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
-        <Header navigation={navigation} title={"Home"} dashboard={true} height={Scales.deviceHeight * 0.08} />
+        <Header navigation={navigation} title={"Home"} dashboard={true} noti={true} height={Scales.deviceHeight * 0.08} />
       </View>
 
       <ScrollView style={{ flex: 1 }}>
+
         <View>
           <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.28 }}>
             <FlatList
@@ -71,6 +99,23 @@ export default function Dashboard({ navigation }) {
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             />
+          </View>
+
+          <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.20, justifyContent: "center" }}>
+            <View style={{ width: Scales.deviceWidth * 0.95, height: Scales.deviceHeight * 0.18, alignSelf: "center", backgroundColor: "white", elevation: 3, borderRadius: 10 }}>
+              <View style={{width:Scales.deviceWidth * 0.95, height: Scales.deviceHeight * 0.05,justifyContent:"center"}}>
+                <Text style={{fontSize:14, paddingLeft:10, color:"#676767"}}>Recharge and Pay Bills</Text>
+              </View>
+            <FlatList
+              data={recharge}
+              renderItem={({ item }) => <Recharge data={item} navigation={navigation} />}
+              keyExtractor={item => item.id}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+
+            />
+            </View>
+
           </View>
 
           <View style={{ flex: 1, }}>
@@ -83,16 +128,31 @@ export default function Dashboard({ navigation }) {
             />
           </View>
         </View></ScrollView>
-      <View style={{ width: Scales.deviceHeight * 0.20, top: Scales.deviceHeight * 0.83, left: Scales.deviceWidth * 0.32, height: Scales.deviceHeight * 0.065, borderRadius: Scales.deviceHeight * 0.3, position: "absolute", backgroundColor: '#e32e59',alignItems:"center",flexDirection:"row" }}>
-      <IonicI  color="white" name="md-qr-code-outline" size={24} style={{paddingLeft:15 }} />
-      <View style={{width:Scales.deviceWidth*0.22,}}>
-      <Text style={{textAlign:"center",color:"white",alignSelf:"center"}}>Scan QR</Text>
-      </View>
+      <View style={{ width: Scales.deviceHeight * 0.20, top: Scales.deviceHeight * 0.83, left: Scales.deviceWidth * 0.32, height: Scales.deviceHeight * 0.065, borderRadius: Scales.deviceHeight * 0.3, position: "absolute", backgroundColor: '#e32e59', alignItems: "center", flexDirection: "row" }}>
+        <IonicI color="white" name="md-qr-code-outline" size={24} style={{ paddingLeft: 15 }} />
+        <View style={{ width: Scales.deviceWidth * 0.22, }}>
+          <Text style={{ textAlign: "center", color: "white", alignSelf: "center" }}>Scan QR</Text>
+        </View>
       </View>
     </View>
 
 
   );
+}
+
+function Recharge({ data,navigation }) {
+  console.log(data)
+  return (
+    <View style={{ width: Scales.deviceWidth * 0.27, height: Scales.deviceHeight * 0.12, justifyContent: "center" }}>
+      <View style={{ width: Scales.deviceWidth * 0.25, height: Scales.deviceHeight * 0.09, alignSelf: "center", }}>
+        <Image source={{uri:data.icon}} style={{resizeMode:"contain",width: Scales.deviceWidth * 0.25, height: Scales.deviceHeight * 0.09,alignSelf:"center" }} />
+      </View>
+      <View style={{width: Scales.deviceWidth * 0.25, height: Scales.deviceHeight * 0.03, justifyContent:"center"}}>
+        <Text style={{textAlign:"center"}}>{data.title}</Text>
+      </View>
+
+    </View>
+  )
 }
 
 
