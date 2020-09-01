@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, View, Text, FlatList, TouchableOpacity,TextInput } from 'react-native';
+import { Image, View, Text, FlatList, TouchableOpacity, TextInput, BackHandler } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 import { useEffect, useState } from "react"
@@ -19,44 +19,57 @@ export default function Nearby({ navigation }) {
       })
       .catch((err) => console.log(err))
   }
-  useEffect(() => {
+
+  function handleBackButtonClick() {
+
+    // navigation.goBack();
+    return true;
+  }
+
+  React.useEffect(() => {
     GetParentCategory()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick)
+    return () => {
+      console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    }
   }, [])
 
 
-  function searchFilterFunction(text){
+
+  function searchFilterFunction(text) {
 
     if (text.length != 0) {
 
-        let newData = parentCatFix.filter(item => {
+      let newData = parentCatFix.filter(item => {
 
-            const itemData = String(item.title)
-            const textData = String(text)
+        const itemData = String(item.title)
+        const textData = String(text)
 
-            // console.log(item.name, "LKKKK0", text)
+        // console.log(item.name, "LKKKK0", text)
 
-            var b = itemData.match(textData)
-
-
-            if (itemData.match(textData)) {
-
-                return item;
-
-            }
+        var b = itemData.match(textData)
 
 
-        });
-        // console.log(newData
-       setparentCat(newData)
+        if (itemData.match(textData)) {
+
+          return item;
+
+        }
+
+
+      });
+      // console.log(newData
+      setparentCat(newData)
 
     }
     else {
-        setparentCat(parentCatFix)
+      setparentCat(parentCatFix)
     }
 
 
 
-};
+  }
 
   const [parentCat, setparentCat] = useState([])
   const [parentCatFix, setparentCatFix] = useState([])
@@ -64,7 +77,7 @@ export default function Nearby({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
       <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
-        <Header navigation={navigation} title={"Home"} noti={true} dashboard={true} height={Scales.deviceHeight * 0.08} />
+        <Header navigation={navigation} title={"Vocal Pe Local"} noti={true} dashboard={true} height={Scales.deviceHeight * 0.08} />
       </View>
 
       <View style={{ width: Scales.deviceWidth * 1.0, flexDirection: "row", height: Scales.deviceHeight * 0.08, backgroundColor: '#f3f7f8' }}>
@@ -76,13 +89,13 @@ export default function Nearby({ navigation }) {
           <TouchableOpacity onPress={() => navigation.navigate("storelist", { "cat_id": 0, "title": "    NearBy Business Users" })}><Text style={{ textAlign: "right", fontSize: Scales.moderateScale(14), color: "#325f98", paddingRight: 10 }}>See All</Text></TouchableOpacity>
         </View>
       </View>
-      {isSearch?<View style={{width:Scales.deviceWidth*1.0, height:Scales.deviceHeight*0.07,justifyContent:"center",}}>
-        <View style={{width:Scales.deviceWidth*0.95,alignSelf:"center", height:Scales.deviceHeight*0.06,borderRadius:10,paddingLeft:10,borderWidth:0.5}}> 
-          <TextInput onChangeText={(text)=>searchFilterFunction(text)} placeholder={"search"} style={{fontSize:Scales.moderateScale(14)}} />
+      {isSearch ? <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07, justifyContent: "center", }}>
+        <View style={{ width: Scales.deviceWidth * 0.95, alignSelf: "center", height: Scales.deviceHeight * 0.06, borderRadius: 10, paddingLeft: 10, borderWidth: 0.5 }}>
+          <TextInput onChangeText={(text) => searchFilterFunction(text)} placeholder={"search"} style={{ fontSize: Scales.moderateScale(14) }} />
         </View>
 
-      </View>:null}
-      <View style={{ width: Scales.deviceWidth * 1.0, height: isSearch?Scales.deviceHeight * 0.70:Scales.deviceHeight * 0.78, }}>
+      </View> : null}
+     { parentCat.length!=0?<View style={{ width: Scales.deviceWidth * 1.0, height: isSearch ? Scales.deviceHeight * 0.70 : Scales.deviceHeight * 0.78, }}>
         <FlatList
           data={parentCat}
           renderItem={({ item, index }) => <NearbyList data={item} index={index} navigation={navigation} />}
@@ -90,9 +103,9 @@ export default function Nearby({ navigation }) {
 
 
         ></FlatList>
-      </View>
+      </View>:<View style={{flex:1, justifyContent:"center"}}><Text style={{textAlign:"center"}}>No Record Found!!</Text></View>}
       <View style={{ width: Scales.deviceWidth * 0.20, height: Scales.deviceHeight * 0.10, position: "absolute", top: Scales.deviceHeight * 0.82, left: Scales.deviceWidth * 0.75, }}>
-        <TouchableOpacity activeOpacity={1} onPress={()=>setisSearch(!isSearch)}><IonicI style={{ alignSelf: "flex-end" }} color={"#e32e59"} size={65} name={"search-circle-sharp"} /></TouchableOpacity>
+        <TouchableOpacity activeOpacity={1} onPress={() => setisSearch(!isSearch)}><IonicI style={{ alignSelf: "flex-end" }} color={"#e32e59"} size={65} name={"search-circle-sharp"} /></TouchableOpacity>
       </View>
     </View>
   );

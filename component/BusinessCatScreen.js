@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, View, Text, FlatList, AsyncStorage,Image } from 'react-native';
+import { Button, View, Text, FlatList, AsyncStorage,Image,BackHandler } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 import Toast from "react-native-simple-toast"
@@ -27,8 +27,18 @@ export default function BusinessCateogry({ navigation }) {
         alert(err)
       })
   }
+  function handleBackButtonClick() {
+    console.log("business cat")
+    // navigation.goBack();
+    return true;
+}
   React.useEffect(() => {
     GetCategiry()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+        console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
   }, [])
   const [data, setData] = React.useState([])
   return (

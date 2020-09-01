@@ -55,9 +55,15 @@ export default function LoginScreen({ route, navigation }) {
                 await AsyncStorage.setItem("user_data", JSON.stringify(json))
 
                 if (json.data.business_customer == false) {
+                    setEmail("")
+                    setPassword("")
+                    setLoading(false)
                     navigation.navigate("AppCustomer")
                 }
                 else {
+                    setEmail("")
+                    setPassword("")
+                    setLoading(false)
                     navigation.navigate("App")
                 }
             }
@@ -90,6 +96,9 @@ export default function LoginScreen({ route, navigation }) {
 
         BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
         return () => {
+            setEmail("")
+            setPassword("")
+            console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
             BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
         };
 

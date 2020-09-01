@@ -32,9 +32,10 @@ export default function MainScreen({ navigation }) {
   React.useEffect(()=>{
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
     return () => {
+      console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
-  })
+  },[])
   return (
     <View style={{ flex: 1, }}>
       <ImageBackground style={{ flex: 1, flexDirection: "column-reverse" }} source={require("../assets/image/login_background.png")}>

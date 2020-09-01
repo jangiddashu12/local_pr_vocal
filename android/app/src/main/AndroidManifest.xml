@@ -28,6 +28,7 @@
         </intent-filter>
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+      <meta-data android:name="com.google.firebase.ml.vision.DEPENDENCIES" android:value="ocr, face" />
       <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDIwiyTe7w1QL55xwNPrEompjwsLX3SuMA"/>
     </application>
 

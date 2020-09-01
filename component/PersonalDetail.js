@@ -5,7 +5,7 @@ import {
   Image,
   View,
   Text,
-  Button,
+  BackHandler,
   AsyncStorage,
 
 } from 'react-native';
@@ -26,10 +26,19 @@ export default function PersonalDetail({ navigation }) {
     let Saved_data = getData()
     setdrawerData(Saved_data)
 }
-useEffect(() => {
-    GetData()
+function handleBackButtonClick() {
+  // navigation.goBack()
+  return true;
+}
+React.useEffect(()=>{
+  GetData()
+  BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+  return () => {
+    BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+  };
+},[console.log(navigation)]
+)
 
-}, [])
 
 const [drawerData, setdrawerData] = useState("");
 let [qr_code_url,seturi]=useState(null)

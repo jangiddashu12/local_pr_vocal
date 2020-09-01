@@ -6,7 +6,8 @@ import {
   View,
   Text,
   TouchableOpacity,
-  YellowBox
+  YellowBox,
+  BackHandler
 } from 'react-native';
 import Header from "./Header"
 import { WebView } from "react-native-webview"
@@ -16,10 +17,20 @@ import { Scales } from "@common"
 
 export default function Activities({ route, navigation }) {
 
+  function handleBackButtonClick() {
+    console.log("activitu")
+    navigation.goBack();
+    return true;
+}
   useEffect(() => {
     YellowBox.ignoreWarnings([
       'Non-serializable values were found in the navigation state',
     ]);
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+        console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
   })
   console.log(route, "--routes")
   return (

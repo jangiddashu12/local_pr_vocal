@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, View, Text, TextInput, CheckBox, TouchableOpacity, ScrollView, FlatList,  } from 'react-native';
+import { Button, View, Text, TextInput, CheckBox, TouchableOpacity, ScrollView, FlatList,BackHandler  } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 import IonicI from 'react-native-vector-icons/Ionicons'
@@ -21,10 +21,21 @@ export default function SelectCategory({ navigation }) {
                 }
             })
     }
-    
+    function handleBackButtonClick() {
+        console.log("bu reg cat")
+        // navigation.goBack();
+        return true;
+    }
+
     React.useEffect(() => {
-        GetCategory()
-       },[])
+         GetCategory()
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+        console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };})
+    
+  
     const [Catdata, setCatData] = React.useState([])
     const [SelectCat, setSelectCat] = React.useState([])
     const [selected, setselected] = React.useState(false)

@@ -6,6 +6,7 @@ import {
     View,
     Text,
     TouchableOpacity,
+    BackHandler,
     AsyncStorage,
 } from 'react-native';
 import Header from "./Header"
@@ -14,9 +15,19 @@ import { Scales } from "@common"
 
 export default function Category({data, navigation}) {
     // console.log(navigation,'--nacooo')
-    useEffect(() => {
-        // console.log(data, "------category-----")
-    })
+    function handleBackButtonClick() {
+        console.log("catss")
+        // navigation.goBack();
+        return true;
+    }
+
+    React.useEffect(() => {
+       
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+        console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };},[])
     return (
         <View style={{ flex: 1 }}>
             <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.05, justifyContent: "center", }}>

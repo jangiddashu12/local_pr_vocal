@@ -8,7 +8,7 @@ import Toast from "react-native-simple-toast"
 import Geolocation from 'react-native-geolocation-service';
 
 
-export default function BusinessRegister({navigation}){
+export default function BusinessRegister({route,navigation}){
     let [name, setName] = React.useState("")
     let [email, setemail] = React.useState("")
     let [no, setNo] = React.useState("")
@@ -26,53 +26,57 @@ export default function BusinessRegister({navigation}){
 
     async function UserRegister() {
         
-        // if(name==""){
-        //     Toast.showWithGravity("Enter a name .", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
-        // if(email==""){
-        //     Toast.showWithGravity("Enter a email address.", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
-        // var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        // const email_test = re.test(String(email).toLowerCase());
-        // if (email_test == false) {
-        //     Toast.showWithGravity("Enter a valid email address.", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
-        // if(businessName==""){
-        //     Toast.showWithGravity("Enter a Business Name .", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
+        if(name==""){
+            Toast.showWithGravity("Enter a name .", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        if(email==""){
+            Toast.showWithGravity("Enter a email address.", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const email_test = re.test(String(email).toLowerCase());
+        if (email_test == false) {
+            Toast.showWithGravity("Enter a valid email address.", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        if(businessName==""){
+            Toast.showWithGravity("Enter a Business Name .", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
        
-        // if(no==""){
-        //     Toast.showWithGravity("Enter a Mobile No.", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
-        // if(pass==""){
-        //     Toast.showWithGravity("Enter a Password.", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
-        // if(pass.length<=8){
-        //     Toast.showWithGravity("Please enter a password with atleast 8 characters", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
-        // if(businessDetail==""){
-        //     Toast.showWithGravity("Enter a Business Detail .", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
-        // if(businessMoto==""){
-        //     Toast.showWithGravity("Enter a Business Moto .", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
-        // if(isSelected==""){
-        //     Toast.showWithGravity("Please accept the privacy.", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
-        // if(city==""||address==""||pin==""){
-        //     Toast.showWithGravity("Addreses is not found.", Toast.SHORT, Toast.BOTTOM);
-        //     return 0;
-        // }
+        if(no==""){
+            Toast.showWithGravity("Enter a Mobile No.", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        if(no>=10){
+            Toast.showWithGravity("Enter valid Mobile No.", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        if(pass==""){
+            Toast.showWithGravity("Enter a Password.", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        if(pass.length<=8){
+            Toast.showWithGravity("Please enter a password with atleast 8 characters", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        if(businessDetail==""){
+            Toast.showWithGravity("Enter a Business Detail .", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        if(businessMoto==""){
+            Toast.showWithGravity("Enter a Business Moto .", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        if(isSelected==""){
+            Toast.showWithGravity("Please accept the privacy.", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
+        if(city==""||address==""||pin==""){
+            Toast.showWithGravity("Addreses is not found.", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
 
        
        navigation.navigate("businessdetail",{"address":address,"city":city,"email":email,"latitude":lat,"longitude":long,"phone":no,"name":name,"password":pass,"zip":pin})
@@ -91,7 +95,7 @@ export default function BusinessRegister({navigation}){
                 //getting the Longitude from the location json
                 const currentLatitude = (position.coords.latitude);
                 console.log(currentLongitude, "---", currentLatitude)
-                this.a = currentLatitude
+                
                 console.log(currentLatitude,currentLongitude, "{{{{{")
               
                 setlat(currentLatitude)
@@ -116,10 +120,12 @@ export default function BusinessRegister({navigation}){
         console.log(address)
     }
     function handleBackButtonClick(){
+        navigation.push("Login")
+
         return true
     }
-    React.useEffect(async()=>{
-        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+
+    async function getLocation(){
         if (Platform.OS === 'ios') {
             callLocation(that);
         } else {
@@ -137,8 +143,20 @@ export default function BusinessRegister({navigation}){
             } else {
                 alert("Permission Denied");
             }
+
         }
-    },[])
+    }
+    
+    React.useEffect(()=>{
+        // console.log(route)
+        getLocation()
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+        
+        // BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+        return () => {
+            console.log(" businer screen handleBackButtonClick);")
+            // BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    }},[])
     return(
         <View style={{flex:1}}>
              <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
@@ -215,7 +233,7 @@ export default function BusinessRegister({navigation}){
                                 label="Address*"
                                 enter_data={address}
                                 value = {address}
-                                onChangeText={(e)=>setaddress(e)}
+                                editable={false}
                                 
                             />
                         </View>

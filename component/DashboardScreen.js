@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   View,
   Text,
+  BackHandler,
   TouchableOpacity,
   AsyncStorage,
 } from 'react-native';
@@ -67,6 +68,13 @@ export default function Dashboard({ navigation }) {
 
 
   }
+  function handleBackButtonClick() {
+    console.log("dashboard")
+    // navigation.goBack();
+    return true;
+}
+
+
 
   useEffect(() => {
 
@@ -74,7 +82,12 @@ export default function Dashboard({ navigation }) {
     GetCat()
     Recharges()
     console.log("===useeffect=====")
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+return () => {
+    console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+    BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);}
 
+//   }
   }, [])
   const [banner, setBanner] = useState([]);
   const [category, setcategory] = useState([]);
@@ -86,7 +99,7 @@ export default function Dashboard({ navigation }) {
     <View style={{ flex: 1, }}>
 
       <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
-        <Header navigation={navigation} title={"Home"} dashboard={true} noti={true} height={Scales.deviceHeight * 0.08} />
+        <Header navigation={navigation} title={"Vocal Pe Local"} dashboard={true} noti={true} height={Scales.deviceHeight * 0.08} />
       </View>
 
       <ScrollView style={{ flex: 1 }}>

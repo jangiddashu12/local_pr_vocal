@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, View, Text, TextInput, CheckBox, TouchableOpacity, ScrollView, FlatList, StyleSheet } from 'react-native';
+import { Button, View, Text, BackHandler, CheckBox, TouchableOpacity, ScrollView, FlatList, StyleSheet } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 import IonicI from 'react-native-vector-icons/Ionicons'
@@ -22,10 +22,18 @@ export default function RegisterCatSub({ route,navigation }) {
                 }
             })
     }
-    React.useEffect(() => {
-        GetCategory()
-        console.log(route)
-    }, [])
+    function handleBackButtonClick() {
+        navigation.goBack()
+        return true;
+      }
+      React.useEffect(()=>{
+          GetCategory()
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+        return () => {
+          BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+        };
+      },[])
+    
     const [Catdata, setCatData] = React.useState([])
     const [SelectCat, setSelectCat] = React.useState([])
     const [selected, setselected] = React.useState(false)
@@ -60,11 +68,11 @@ export default function RegisterCatSub({ route,navigation }) {
                 <Header navigation={navigation} title={"Select Business Sub-Category"} dashboard={false} size={16} height={Scales.deviceHeight * 0.08} />
             </View>
             <View style={{ flex: 1 }}>
-                <FlatList
+                {Catdata.length!=0?<FlatList
                     data={Catdata}
                     renderItem={(data) => <Category data={data} navigation={navigation} SelectCatogey = {SelectCatogey} />}
                     keyExtractor={item => item.id}
-                />
+                />:<View style={{flex:1, justifyContent:"center"}}><Text style={{textAlign:"center"}}>No Record Found!!</Text></View>}
             </View>
             <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.10, justifyContent: "center" }}>
                 <TouchableOpacity onPress={() => GoTo()}><View style={{ width: Scales.deviceWidth * 0.80, justifyContent: "center", borderRadius: Scales.deviceHeight * 0.04, height: Scales.deviceHeight * 0.07, backgroundColor: selected?"#e32e59":'#cccccc', alignSelf: "center" }}>

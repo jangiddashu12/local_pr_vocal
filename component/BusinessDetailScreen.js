@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, View, Text, AsyncStorage } from 'react-native';
+import { Button, View, Text, AsyncStorage,BackHandler } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 
@@ -12,9 +12,19 @@ export default function BusinessDetail({ navigation }) {
         console.log((user_data.data.business_detail))
         setData(user_data.data.business_detail)
     }
+    function handleBackButtonClick() {
+        console.log("business detail")
+        // navigation.goBack();
+        return true;
+    }
 
     React.useEffect(() => {
         Getdata()
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+        console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
         // setData(user_data.data.business_detail)
     }, [])
     // console.log(data)

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
-    StyleSheet,
+    BackHandler,
     TouchableOpacity,
     View,
     Text,
@@ -99,6 +99,18 @@ export default function Payment({ route,navigation }) {
             // alert(`Error: ${error.code} | ${error.description}`);
         });
     }
+
+    function handleBackButtonClick() {
+        navigation.goBack()
+        return true;
+      }
+      React.useEffect(()=>{
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+        return () => {
+          BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+        };
+      },[])
+    
     return (
         <View style={{ flex: 1, }}>
             <ImageBackground style={{ flex: 1, flexDirection: "column-reverse" }} source={require("../assets/image/login_background.png")}>

@@ -29,6 +29,22 @@ export default function BusinessCustomerDetail({navigation}){
        
        navigation.navigate("SelectCategory",{"moto":businessMoto,"detail":BusinessDetail,"title":businessName})
     }
+    function handleBackButtonClick() {
+
+        navigation.goBack();
+        return true;
+    }
+
+    React.useEffect(() => {
+         
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+        setbusinessName("")
+        setbusinessMoto("")
+        setbusinessDetail("")
+        console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };},[])
     return(
         <View style={{ flex: 1 }}>
         <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, View, Text, Platform, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Button, View, Text, Platform, ActivityIndicator, TouchableOpacity ,BackHandler} from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 import MapView, { PROVIDER_GOOGLE, Marker, } from 'react-native-maps';
@@ -25,7 +25,8 @@ export default class Map extends React.Component {
             address: "",
             city: "",
             latdelta: 0.05,
-            longdelta: 0.05
+            longdelta: 0.05,
+            default:true
         }
         this.mapRef = React.createRef(this);
     }
@@ -58,12 +59,32 @@ export default class Map extends React.Component {
             .catch(error => console.warn(error));
 
     }
+    handleBackButtonClick=()=> {
+
+        navigation.goBack();
+        return true;
+    }
+    
+    
+
+    
     componentDidMount = async () => {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         console.log(this.props.route.params)
-        this.setState({ lat: this.props.route.params.lat, long: this.props.route.params.long })
+        let def = true
+        if(this.props.route.params.default==false){
+            def = false
+        }
+
+        this.setState({ lat: this.props.route.params.lat, long: this.props.route.params.long, default:def })
+        
         Geocoder.init("AIzaSyDIwiyTe7w1QL55xwNPrEompjwsLX3SuMA");
 
 
+    }
+
+    componentWillUnmount=()=>{
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
     }
 
     // callLocation = async() => {
@@ -97,6 +118,7 @@ export default class Map extends React.Component {
 
 
     // }
+
     GoBAck = () => {
 
         this.props.route.params.Setfunc(this.state.city, this.state.address, "452001")
@@ -170,11 +192,11 @@ export default class Map extends React.Component {
                             <Text style={{ textAlign: "center" }}>{this.state.address}</Text>
                         </View>
                     </View>
-                    <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.10, justifyContent: "center" }}>
+                    {this.state.default?<View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.10, justifyContent: "center" }}>
                         <TouchableOpacity onPress={() => this.GoBAck()}><View style={{ backgroundColor: "red", width: Scales.deviceWidth * 0.60, justifyContent: "center", height: Scales.deviceHeight * 0.08, borderRadius: Scales.deviceHeight * 0.04, backgroundColor: "#e32e59", alignSelf: "center" }}>
                             <Text style={{ textAlign: "center", fontSize: Scales.moderateScale(16), color: "white" }}>Confirm Location</Text>
                         </View></TouchableOpacity>
-                    </View>
+                    </View>:null}
                 </View>
 
             </View>

@@ -8,6 +8,7 @@ import {
     Text,
     Image,
     AsyncStorage,
+    BackHandler
 
 } from 'react-native';
 
@@ -15,9 +16,19 @@ import { Scales } from "@common"
 import IonicI from 'react-native-vector-icons/Ionicons'
 
 export default function Header({ navigation,dashboard,title,size=20,noti = false, special = false, nav = "" }) {
-    React.useEffect(()=>{
-       
-    },[ ])
+    // function handleBackButtonClick() {
+
+    //     navigation.goBack();
+    //     return true;
+    // }
+    
+    // React.useEffect(() => {
+      
+    //     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    // return () => {
+    //     console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+    //     BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    // };},[])
     // console.log(navigation,"Header navigation")
     return (
         <View style={{ flex: 1, }}>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, View, Text, ScrollView, TouchableOpacity, AsyncStorage, Image } from 'react-native';
+import { Button, View, Text, ScrollView, TouchableOpacity, AsyncStorage, Image,BackHandler } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 
@@ -134,9 +134,20 @@ export default function News({ navigation }) {
       }
     })
   }
-  React.useEffect(()=>{
-    GetTopNavigation()
-  },[])
+  function handleBackButtonClick() {
+
+    // navigation.goBack();
+    return true;
+}
+
+React.useEffect(() => {
+  GetTopNavigation()
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+return () => {
+    console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+    BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+}
+;},[])
   // let renderCat=[]
   // console.log(renderCat())
   const [category, setCategory] = React.useState([])
@@ -151,7 +162,7 @@ export default function News({ navigation }) {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
-        <Header noti={true} navigation={navigation} title={"Home"} dashboard={true} />
+        <Header noti={true} navigation={navigation} title={"Vocal Pe Local"} dashboard={true} />
       </View>
 
       {category.length!=0?<Tab.Navigator tabBarOptions={{ scrollEnabled: true, style: { height: Scales.deviceHeight * 0.055, justifyContent: "center" }, activeTintColor: "#e32e59", inactiveTintColor: "black", indicatorStyle: { backgroundColor: 'red', width: 120 }, labelStyle: { fontSize: 12, textAlignVertical: "center", alignSelf: "center" }, tabStyle: { width: 130, alignSelf: "center", } }} >

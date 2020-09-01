@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { Button, View, Text, TextInput, CheckBox, AsyncStorage, BackHandler, PermissionsAndroid,ActivityIndicator } from 'react-native';
+import { Button, View, Text, TextInput, CheckBox, AsyncStorage, BackHandler, PermissionsAndroid, ActivityIndicator,TouchableOpacity } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 import IonicI from 'react-native-vector-icons/Ionicons'
 import PostFetch from '../ajax/PostFetch'
 import Toast from "react-native-simple-toast"
-import { TouchableOpacity } from 'react-native-gesture-handler';
+
 import Geolocation from 'react-native-geolocation-service';
 import Modal from "react-native-modal"
 
@@ -80,6 +80,10 @@ export default function CustomerSignup({ route, navigation }) {
             Toast.showWithGravity("Enter a Mobile No.", Toast.SHORT, Toast.BOTTOM);
             return 0;
         }
+        if (no >= 10) {
+            Toast.showWithGravity("Enter valid Mobile No.", Toast.SHORT, Toast.BOTTOM);
+            return 0;
+        }
         if (pass == "") {
             Toast.showWithGravity("Enter a Password.", Toast.SHORT, Toast.BOTTOM);
             return 0;
@@ -133,12 +137,13 @@ export default function CustomerSignup({ route, navigation }) {
         setLoading(false)
     }
     function handleBackButtonClick() {
+        // navigation.popToTop()
+        console.log(navigation.push)
+        navigation.push("Login")
         return true
     }
-    React.useEffect(async () => {
-        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
 
-        //Checking for the permission just after component loaded
+    async function getLocation() {
         if (Platform.OS === 'ios') {
             callLocation(that);
         } else {
@@ -157,174 +162,194 @@ export default function CustomerSignup({ route, navigation }) {
                 alert("Permission Denied");
             }
         }
-    }, [])
-    const [loading, setLoading] = React.useState(false)
-    console.log(lat, long)
-    return (
-        <View style={{ flex: 1 }}>
-            <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
-                <Header navigation={navigation} dashboard={false} title={"User Registration"} special={true} nav={"Login"} />
-            </View>
+    }
+        React.useEffect(() => {
+            BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+
+            //Checking for the permission just after component loaded
+            getLocation()
+
+            return () => {
+                setName("")
+                setemail("")
+                setNo("")
+                setpass("")
+                setSelection(false);
+                setlat("")
+                setlong("")
+                setcity("")
+                setaddress("")
+                setPin("")
+                console.log("customer screen")
+                // BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+            }
+        }, [])
+        const [loading, setLoading] = React.useState(false)
+        console.log(lat, long)
+        return (
             <View style={{ flex: 1 }}>
-                <View style={{ width: Scales.deviceWidth * 1.0, paddingTop: 25, height: Scales.deviceHeight * 0.70, }}>
-                    <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, }}>
-                        <FloatingLabelInput
-                            label="Name*"
-                            onChangeText={(e) => { setName(e) }}
-                            enter_data={name}
-
-                        />
-                    </View>
-                    <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, }}>
-                        <FloatingLabelInput
-                            label="Email*"
-                            onChangeText={(e) => { setemail(e) }}
-                            enter_data={email}
-
-                        />
-                    </View>
-                    <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, }}>
-                        <FloatingLabelInput
-                            label="Mobile Number*"
-                            onChangeText={(e) => { setNo(e) }}
-                            enter_data={no}
-                            maxLength={10}
-                            keyboardType={"number-pad"}
-
-                        />
-                    </View>
-                    <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, }}>
-                        <FloatingLabelInput
-                            label="Password*"
-                            onChangeText={(e) => { setpass(e) }}
-                            enter_data={pass}
-                            secureTextEntry={true}
-
-                        />
-                    </View>
-                    <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, flexDirection: "row", height: Scales.deviceHeight * 0.10, }}>
-                        <View style={{ width: Scales.deviceWidth * 0.70, height: Scales.deviceHeight * 0.10, }}>
+                <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
+                    <Header navigation={navigation} dashboard={false} title={"User Registration"} special={true} nav={"Login"} />
+                </View>
+                <View style={{ flex: 1 }}>
+                    <View style={{ width: Scales.deviceWidth * 1.0, paddingTop: 25, height: Scales.deviceHeight * 0.70, }}>
+                        <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, }}>
                             <FloatingLabelInput
-                                label="Address*"
-                                enter_data={address}
-                                value={address}
-                                onChangeText={(e) => setaddress(e)}
-
+                                label="Name*"
+                                onChangeText={(e) => { setName(e) }}
+                                enter_data={name}
 
                             />
                         </View>
-                        <TouchableOpacity onPress={() => navigation.navigate("map", { "Setfunc": SetAddressDetail, "lat": lat, "long": long })}><View style={{ width: Scales.deviceWidth * 0.12, paddingTop: 10, height: Scales.deviceHeight * 0.10, }}>
-                            <IonicI size={24} name="location" style={{ alignSelf: "flex-end" }} />
+                        <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, }}>
+                            <FloatingLabelInput
+                                label="Email*"
+                                onChangeText={(e) => { setemail(e) }}
+                                enter_data={email}
+
+                            />
+                        </View>
+                        <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, }}>
+                            <FloatingLabelInput
+                                label="Mobile Number*"
+                                onChangeText={(e) => { setNo(e) }}
+                                enter_data={no}
+                                maxLength={10}
+                                keyboardType={"number-pad"}
+
+                            />
+                        </View>
+                        <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, }}>
+                            <FloatingLabelInput
+                                label="Password*"
+                                onChangeText={(e) => { setpass(e) }}
+                                enter_data={pass}
+                                secureTextEntry={true}
+
+                            />
+                        </View>
+                        <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, flexDirection: "row", height: Scales.deviceHeight * 0.10, }}>
+                            <View style={{ width: Scales.deviceWidth * 0.70, height: Scales.deviceHeight * 0.10, }}>
+                                <FloatingLabelInput
+                                    label="Address*"
+                                    enter_data={address}
+                                    value={address}
+                                    editable={false}
+
+                                />
+                            </View>
+                            <TouchableOpacity onPress={() => navigation.navigate("map", { "Setfunc": SetAddressDetail, "lat": lat, "long": long })}><View style={{ width: Scales.deviceWidth * 0.12, paddingTop: 10, height: Scales.deviceHeight * 0.10, }}>
+                                <IonicI size={24} name="location" style={{ alignSelf: "flex-end" }} />
+                            </View></TouchableOpacity>
+                        </View>
+                        <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, flexDirection: 'row' }}>
+                            <View style={{ width: Scales.deviceWidth * 0.10, height: Scales.deviceHeight * 0.05, }}>
+                                <CheckBox
+                                    value={isSelected}
+                                    onValueChange={setSelection}
+                                />
+                            </View>
+                            <View style={{ width: Scales.deviceWidth * 0.60, justifyContent: "center", height: Scales.deviceHeight * 0.045 }}>
+                                <Text style={{ color: "#e32e59" }}>Privacy Policy</Text>
+                            </View>
+
+                        </View>
+
+
+                    </View>
+                    <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.20, flexDirection: "column-reverse" }}>
+                        <TouchableOpacity onPress={() => UserRegister()}><View style={{ width: Scales.deviceWidth * 0.80, justifyContent: "center", borderRadius: Scales.deviceHeight * 0.04, height: Scales.deviceHeight * 0.07, backgroundColor: button_status ? "#e32e59" : '#cccccc', alignSelf: "center" }}>
+                            <Text style={{ textAlign: "center", fontSize: Scales.moderateScale(18), color: button_status ? "#ffffff" : "#696969" }}>Register</Text>
                         </View></TouchableOpacity>
                     </View>
-                    <View style={{ width: Scales.deviceWidth * 1.0, paddingLeft: 20, height: Scales.deviceHeight * 0.10, flexDirection: 'row' }}>
-                        <View style={{ width: Scales.deviceWidth * 0.10, height: Scales.deviceHeight * 0.05, }}>
-                            <CheckBox
-                                value={isSelected}
-                                onValueChange={setSelection}
-                            />
-                        </View>
-                        <View style={{ width: Scales.deviceWidth * 0.60, justifyContent: "center", height: Scales.deviceHeight * 0.045 }}>
-                            <Text style={{ color: "#e32e59" }}>Privacy Policy</Text>
-                        </View>
+                </View>
+                <Modal isVisible={loading}>
 
+                    <View style={{ flex: 1, justifyContent: "center" }}>
+                        <ActivityIndicator size={20} style={{ alignSelf: "center" }} />
                     </View>
 
-
-                </View>
-                <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.20, flexDirection: "column-reverse" }}>
-                    <TouchableOpacity onPress={() => UserRegister()}><View style={{ width: Scales.deviceWidth * 0.80, justifyContent: "center", borderRadius: Scales.deviceHeight * 0.04, height: Scales.deviceHeight * 0.07, backgroundColor: button_status ? "#e32e59" : '#cccccc', alignSelf: "center" }}>
-                        <Text style={{ textAlign: "center", fontSize: Scales.moderateScale(18), color: button_status ? "#ffffff" : "#696969" }}>Register</Text>
-                    </View></TouchableOpacity>
-                </View>
+                </Modal>
             </View>
-            <Modal isVisible={loading}>
-
-                <View style={{ flex: 1, justifyContent: "center" }}>
-                    <ActivityIndicator size={20} style={{ alignSelf: "center" }} />
-                </View>
-
-            </Modal>
-        </View>
-    )
-}
-
-
-
-class FloatingLabelInput extends React.Component {
-    state = {
-        isFocused: false,
-        password_hide: true,
-        focus: false
-    };
-
-    handleFocus = () => this.setState({ isFocused: true, focus: true });
-    handleBlur = () => {
-
-        if (this.props.enter_data.length == 0) {
-            this.setState({ isFocused: false });
-        }
-        this.setState({ focus: !this.state.focus })
-
+        )
     }
-    UNSAFE_componentWillReceiveProps = (props) => {
-        // console.log(props.label)
-        if (props.label == "Address*") {
-            if (props.enter_data.length != 0) {
-                console.log(props)
-                if (!this.state.isFocused) {
-                    this.setState({ focus: !this.state.focus, isFocused: true })
-                }
 
+
+
+    class FloatingLabelInput extends React.Component {
+        state = {
+            isFocused: false,
+            password_hide: true,
+            focus: false
+        };
+
+        handleFocus = () => this.setState({ isFocused: true, focus: true });
+        handleBlur = () => {
+
+            if (this.props.enter_data.length == 0) {
+                this.setState({ isFocused: false });
+            }
+            this.setState({ focus: !this.state.focus })
+
+        }
+        UNSAFE_componentWillReceiveProps = (props) => {
+            // console.log(props.label)
+            if (props.label == "Address*") {
+                if (props.enter_data.length != 0) {
+                    console.log(props)
+                    if (!this.state.isFocused) {
+                        this.setState({ focus: !this.state.focus, isFocused: true })
+                    }
+
+                }
+                else {
+                    this.setState({ focus: !this.state.focus, isFocused: false })
+                }
+            }
+
+        }
+
+
+
+        render() {
+
+            const { label, ...props } = this.props;
+            const { isFocused } = this.state;
+
+            const labelStyle = {
+                position: 'absolute',
+                left: 0,
+                top: !isFocused ? 25 : 5,
+                fontSize: !isFocused ? Scales.moderateScale(14) : Scales.moderateScale(12),
+                color: !this.state.focus ? '#676767' : '#e32e59', fontFamily: "../assets/font/Roboto-Bold",
+                paddingLeft: 10
+
+            };
+            let view_style = {}
+            if (this.props.pass != true) {
+                view_style = {}
             }
             else {
-                this.setState({ focus: !this.state.focus, isFocused: false })
+                view_style = { flexDirection: "row", width: Scales.deviceWidth * 0.85 }
             }
-        }
+            return (
+                <View style={{ paddingTop: 10 }}>
+                    <Text style={labelStyle}>
+                        {label}
+                    </Text>
+                    <View style={view_style}>
+                        <TextInput
 
-    }
+                            {...props}
+                            style={{ paddingLeft: 10, }}
+                            onFocus={this.handleFocus}
+                            onBlur={this.handleBlur}
 
+                        />
 
-
-    render() {
-
-        const { label, ...props } = this.props;
-        const { isFocused } = this.state;
-
-        const labelStyle = {
-            position: 'absolute',
-            left: 0,
-            top: !isFocused ? 25 : 5,
-            fontSize: !isFocused ? Scales.moderateScale(14) : Scales.moderateScale(12),
-            color: !this.state.focus ? '#676767' : '#e32e59', fontFamily: "../assets/font/Roboto-Bold",
-            paddingLeft: 10
-
-        };
-        let view_style = {}
-        if (this.props.pass != true) {
-            view_style = {}
-        }
-        else {
-            view_style = { flexDirection: "row", width: Scales.deviceWidth * 0.85 }
-        }
-        return (
-            <View style={{ paddingTop: 10 }}>
-                <Text style={labelStyle}>
-                    {label}
-                </Text>
-                <View style={view_style}>
-                    <TextInput
-
-                        {...props}
-                        style={{ paddingLeft: 10, }}
-                        onFocus={this.handleFocus}
-                        onBlur={this.handleBlur}
-
-                    />
-
+                    </View>
+                    <View style={{ borderWidth: 0.8, backgroundColor: "#e32e59", bottom: 10, borderColor: this.state.focus ? "#e32e59" : '#b1b1b1', width: Scales.deviceWidth * 0.85 }}></View>
                 </View>
-                <View style={{ borderWidth: 0.8, backgroundColor: "#e32e59", bottom: 10, borderColor: this.state.focus ? "#e32e59" : '#b1b1b1', width: Scales.deviceWidth * 0.85 }}></View>
-            </View>
-        );
+            );
+        }
     }
-}

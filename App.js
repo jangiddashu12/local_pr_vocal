@@ -10,11 +10,11 @@ import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
-  ScrollView,
+  TouchableOpacity,
   View,
   Text,
   Button,
-  AsyncStorage,
+  Share,
 
 } from 'react-native';
 
@@ -51,10 +51,47 @@ import AddMoney from "./component/AddMoneyScreen"
 import ScanScreen from "./component/ScannerQR"
 import NotificationScreen from "./component/NotificationScreen"
 import BusinessCustomerDetail from "./component/CustomerBusinessDetail"
+import Header from "./component/Header"
+import {Scales} from "@common"
+import Fontisto from "react-native-vector-icons/Fontisto"
 
+import ProductDetail from "./component/ProductDetailScreen"
 
-
-
+function Shares({navigation}){
+  async function onShare(){
+    try {
+      const result = await Share.share({
+        message:'प्रिय ग्राहक मेरा व्यवसाय Vani Krashi Sewa Kendra लोकल पे वोकल पर उपलब्ध हूं, कृपया लोकल पे वोकल द्वारा पैसे का भुगतान करें, अपना उत्पाद खरीदें या लोकल पे वोकल द्वारा सेवाएं प्राप्त करें ताकि मैं डिजिटल बन जाऊं Download LocalPeVocal https://play.google.com/store/apps/details?id=com.sumanwebdev.app.locapevocal',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+  return(
+    <View style={{flex:1, }}>
+      <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
+                <Header navigation={navigation} title={"Share"} size={18} dashboard={true} height={Scales.deviceHeight * 0.08} />
+            </View>
+      <View style={{width:Scales.deviceWidth*0.95, borderBottomWidth:0.8,alignSelf:"center",flexDirection:"row"}}>
+      <View style={{width:Scales.deviceWidth*0.75, paddingLeft:15, marginTop:20}}>
+        <Text style={{fontSize:18}}>प्रिय ग्राहक {"\n"}मेरा व्यवसाय Vani Krashi Sewa Kendra लोकल पे वोकल पर उपलब्ध हूं, कृपया लोकल पे वोकल द्वारा पैसे का भुगतान करें, अपना उत्पाद खरीदें या लोकल पे वोकल द्वारा सेवाएं प्राप्त करें ताकि मैं डिजिटल बन जाऊं Download LocalPeVocal https://play.google.com/store/apps/details?id=com.sumanwebdev.app.locapevocal</Text>
+      </View>
+      <View style={{width:Scales.deviceWidth*0.20,  justifyContent:"center"}}>
+        <TouchableOpacity onPress={onShare}><Fontisto name={"share"} size={30} style={{alignSelf:"center"}} color={"#e32e59"} /></TouchableOpacity>
+      </View>
+      </View>
+    </View>
+  )
+}
 
 
 
@@ -69,7 +106,7 @@ const AuthStack = () => (
   >
     <Auth.Screen name="Login" options={{ headerShown: false }} component={MainScreen} />
     <Auth.Screen name="logins" options={{ headerShown: false }} component={LoginScreen} />
-    <Auth.Screen name="businessregister" options={{ headerShown: false }} component={BusinessRegister} />
+    <Auth.Screen name="businessregister" options={{ headerShown: false }}  component={BusinessRegister} />
     <Auth.Screen name="customersignup" options={{ headerShown: false }} component={CustomerSignup} />
     <Auth.Screen name="SelectCategory" options={{ headerShown: false }} component={SelectCategory} />
 
@@ -94,6 +131,7 @@ const DrawerStack = ({ navigation }) => {
       <Drawer.Screen name="Business Categories" component={BusinessCateogry} />
       <Drawer.Screen name="Business Detail" component={BusinessDetail} />
       <DrawerCustomer.Screen name='Account' component={AddMoney} />
+      <DrawerCustomer.Screen name='Share' component={Shares} />
 
 
 
@@ -135,6 +173,7 @@ function Main() {
         <RootStack.Screen name='map' component={Map} />
         <RootStack.Screen name='notification' component={NotificationScreen} />
         <RootStack.Screen name='ScanScreen' component={ScanScreen} />
+        <RootStack.Screen name='ProductDetail' component={ProductDetail} />
         
       </RootStack.Navigator>
     </NavigationContainer>)

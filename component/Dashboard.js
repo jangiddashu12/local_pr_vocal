@@ -81,7 +81,9 @@ function MyTabBar({ state, descriptors, navigation }) {
           >
             <View style={{height:Scales.deviceHeight*0.045,width:Scales.deviceWidth*0.20, justifyContent:"center"}}>
               {label=="Dashboard"?<Icon  color="white" name="home" size={isFocused?24:22} style={{alignSelf:"center", marginTop:isFocused?0:Scales.deviceHeight*0.02}} />:null}
-              {label=="स्वच्छता अभियान"?<Icon  color="white" name="google-drive" size={isFocused?24:22} style={{alignSelf:"center", marginTop:isFocused?0:Scales.deviceHeight*0.02}} />:null}
+              {/* {label=="मेरी सरकार"?<Icon  color="white" name="google-drive" size={isFocused?24:22} style={{alignSelf:"center", marginTop:isFocused?0:Scales.deviceHeight*0.02}} />:null} */}
+              {label=="मेरी सरकार"?<Image source={require("../assets/image/dustbin.png")} style={{alignSelf:"center",width:Scales.deviceWidth*0.04,height:isFocused?Scales.deviceHeight*0.03:Scales.deviceHeight*0.03, marginTop:isFocused?0:Scales.deviceHeight*0.02}} />:null}
+              
               {label=="Scan QR"?<IonicI  color="white" name="scan" size={isFocused?24:22} style={{alignSelf:"center", marginTop:isFocused?0:Scales.deviceHeight*0.02}} />:null}
               {label=="News"?<IonicI  color="white" name="newspaper-outline" size={isFocused?24:22} style={{alignSelf:"center", marginTop:isFocused?0:Scales.deviceHeight*0.02}} />:null}
               {label=="Near By"?<FontAwesomeI color="white" name="map-marker-alt" size={isFocused?24:20} style={{alignSelf:"center",marginTop:isFocused?0:Scales.deviceHeight*0.02}} />:null}
@@ -101,7 +103,7 @@ function jobs({navigation}){
   return(
     <View style={{flex:1}}>
       <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.08 }}>
-          <Header navigation={navigation} noti={true} title={"Home"} dashboard={true} height={Scales.deviceHeight * 0.08} />
+          <Header navigation={navigation} noti={true} title={"Vocal Pe Local"} dashboard={true} height={Scales.deviceHeight * 0.08} />
         </View>
        <View style={{flex:1,justifyContent:"center"}}>
                 <Text style={{textAlign:"center"}}>coming Soon!</Text>
@@ -120,7 +122,7 @@ function MyTabs({navigation}) {
       <Tab.Screen name="Near By" component={NearBy} />
       <Tab.Screen  name="Scan QR" component={jobs} />
       <Tab.Screen  name="News" component={News} />
-      <Tab.Screen name="स्वच्छता अभियान" component={Clean} />
+      <Tab.Screen name="मेरी सरकार" component={Clean} />
      
       
     </Tab.Navigator>
@@ -132,17 +134,8 @@ function MyTabs({navigation}) {
 
 export default function HomeScreen({ route, navigation }) {
   function handleBackButtonClick() {
-    // console.log(route)
-    // if(route.name=="Home"){
-    //   Alert.alert("Local pe Vocal!", "Are you really want to exit?", [
-    //     {
-    //       text: "Cancel",
-    //       onPress: () => null,
-    //       style: "cancel"
-    //     },
-    //     { text: "YES", onPress: () => BackHandler.exitApp() }
-    //   ]);
-    // }
+    console.log("upper dashboard")
+    // navigation.goBack()
     return true;
   }
   React.useEffect(()=>{
@@ -150,7 +143,7 @@ export default function HomeScreen({ route, navigation }) {
     return () => {
       BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
     };
-  })
+  },[])
   return (
     <MyTabs navigation={navigation} />
     

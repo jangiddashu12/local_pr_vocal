@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, View, Text, TextInput, CheckBox, TouchableOpacity, ScrollView, FlatList, StyleSheet } from 'react-native';
+import { Button, View, Text, TextInput, BackHandler, TouchableOpacity, ScrollView, FlatList, StyleSheet } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 import IonicI from 'react-native-vector-icons/Ionicons'
@@ -22,9 +22,17 @@ export default function Plans({ route, navigation }) {
                 }
             })
     }
-    React.useEffect(() => {
-        getPLans()
-    }, [])
+    function handleBackButtonClick() {
+        navigation.goBack()
+        return true;
+      }
+      React.useEffect(()=>{
+          getPLans()
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+        return () => {
+          BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+        };
+      },[])
     const [plan, setPlan] = React.useState([])
     return (
         <View style={{ flex: 1 }}>

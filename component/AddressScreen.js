@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, View, Text, TextInput, CheckBox, TouchableOpacity, ScrollView, FlatList, StyleSheet, AsyncStorage } from 'react-native';
+import { Button, View, Text, TextInput, CheckBox, TouchableOpacity, ScrollView, FlatList, BackHandler, AsyncStorage } from 'react-native';
 import Header from "./Header"
 import { Scales } from "@common"
 import IonicI from 'react-native-vector-icons/Ionicons'
@@ -12,8 +12,19 @@ export default function Address({ navigation }) {
         user_data = JSON.parse(user_data)
         setuserData(user_data.data.customer_address)
     }
+    function handleBackButtonClick() {
+        console.log("Address")
+        // navigation.goBack();
+        return true;
+    }
+    
     React.useEffect(() => {
         Getdata()
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+        console.log(" add money);")
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
 
     }, [])
     const [userData, setuserData] = React.useState([])

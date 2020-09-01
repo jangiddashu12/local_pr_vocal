@@ -6,7 +6,7 @@ import {
   View,
   Text,
   FlatList,
-  AsyncStorage,
+  AsyncStorage,BackHandler
 
 } from 'react-native';
 import Header from "./Header"
@@ -19,7 +19,7 @@ export default function NotificationScreen({ navigation }) {
     setLoading(true)
     let id = await AsyncStorage.getItem("id")
     let uri = "https://local-pe-vocal.in/api/customer/notification/" + String(id)
-    fetch(uri)
+    await fetch(uri)
       .then(resp => resp.json())
       .then(json => {
 
@@ -36,9 +36,23 @@ export default function NotificationScreen({ navigation }) {
       setLoading(false)
 
   }
-  React.useEffect(() => {
-    GetNotfication()
-  }, [])
+  function handleBackButtonClick() {
+    console.log("notification")
+    navigation.goBack();
+    return true;
+}
+
+React.useEffect(() => {
+  GetNotfication()
+
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+        console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
+
+}, [])
+
 
   const [notification, setNoti] = React.useState([])
   const [loading,setLoading] = React.useState(false)
@@ -48,13 +62,13 @@ export default function NotificationScreen({ navigation }) {
         <Header navigation={navigation} title={"Notification"} dashboard={false} height={Scales.deviceHeight * 0.08} />
       </View>
       <View style={{ flex: 1 }}>
-        <FlatList
+        {notification.length!=0?<FlatList
           data={notification}
           renderItem={({ item }) => <NotificationList data={item} navigation={navigation} />}
           keyExtractor={item => item.id}
           showsHorizontalScrollIndicator={false}
 
-        />
+        />:<View style={{flex:1, justifyContent:"center"}}><Text style={{textAlign:"center"}}>No Notification Found!</Text></View>}
       </View>
 
       <Modal isVisible={loading}>

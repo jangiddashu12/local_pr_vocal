@@ -8,7 +8,8 @@ import {
     Text,
     TouchableOpacity,
     RefreshControl,
-    AsyncStorage
+    AsyncStorage,
+    BackHandler
 } from 'react-native';
 import Header from "./Header"
 import FontAwesome from 'react-native-vector-icons/FontAwesome5'
@@ -31,7 +32,7 @@ export default function AddMoney({ navigation }) {
             .then((json) => {
                 if (json.status == true) {
                     setData(json.data)
-                    console.log(data.wallet_ledger)
+                    // console.log(data.wallet_ledger, "---------")
                 }
                 else {
                     alert(json.message)
@@ -42,9 +43,14 @@ export default function AddMoney({ navigation }) {
                 setrefresh(false)
             }
     }
-    useEffect(() => {
-        GetData()
-    }, [])
+   function handleBackButtonClick(){
+        console.log("add money")
+        // navigation.goBack();
+        return true;
+    }
+    
+   
+   
    
     function EnterAmt(text){
         setamt(text)
@@ -54,12 +60,7 @@ export default function AddMoney({ navigation }) {
     }
 
     function MakePayment(){
-        if(amt<100){
-            Toast.showWithGravity("Enter more than 100", Toast.SHORT, Toast.BOTTOM);
-            return 0
-        }
-        if(desc==""){
-            Toast.showWithGravity("Enter Descprition", Toast.SHORT, Toast.BOTTOM);
+        if(amt==""){
             return 0
         }
         var options = {
@@ -84,12 +85,12 @@ export default function AddMoney({ navigation }) {
                 
             };
             let send_id = await AsyncStorage.getItem("id")
-            console.log(data)
+            // console.log(data)
             let payload={"amount":amt,"transaction_id":data.razorpay_payment_id,"transaction_type":"Razerpay","transaction_title":desc,"transaction_description":desc,"sender_id":send_id}
             let url = "https://local-pe-vocal.in/api/customer/wallet/addmoney/" + String(send_id)
-            console.log(payload)
+            // console.log(payload)
             const json = await PostFetch(url, payload, headers)
-            console.log(json)
+            // console.log(json)
             if(json!=null){
                 if(json.status==true){
                     Toast.showWithGravity("Successfully", Toast.SHORT, Toast.BOTTOM);
@@ -110,6 +111,20 @@ export default function AddMoney({ navigation }) {
     const [amt, setamt] = useState(0)
     const [desc,setdesc] =useState("")
     let[refresh,setrefresh] = useState(false)
+
+    function handleBackButtonClick() {
+
+        // navigation.goBack();
+        return true;
+    } 
+    React.useEffect(()=>{
+        GetData()
+        BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+        console.log(" BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);")
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
+    },[])
     return (
         <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
             <View style={{ width: Scales.deviceWidth * 1.0, height: Scales.deviceHeight * 0.07 }}>
@@ -152,7 +167,7 @@ export default function AddMoney({ navigation }) {
                         data={data.wallet_ledger}
                         renderItem={({ item, index }) => <WalletLedger data={item} index={index} navigation={navigation} />}
                         keyExtractor={item => String(item.id)}
-                        style={{ backgroundColor: "#ffffff", width: Scales.deviceWidth * 0.85 }}
+                        style={{ backgroundColor: "#ffffff", width: Scales.deviceWidth * 0.90 }}
                         
 
 
@@ -168,31 +183,31 @@ export default function AddMoney({ navigation }) {
 function WalletLedger({ data, index, navigation }) {
     // console.log(data)
     return (
-        <View style={{ width: Scales.deviceWidth * 0.85, flexDirection: "row",  }}>
-            <View style={{ width: Scales.deviceWidth * 0.20, height: Scales.deviceHeight * 0.10, }}>
+        <View style={{ width: Scales.deviceWidth * 0.90, flexDirection: "row",alignItems:"center"  }}>
+            <View style={{  height: Scales.deviceHeight * 0.12,justifyContent:"center" }}>
                 <View style={{width: Scales.deviceWidth * 0.15,justifyContent:"center", height: Scales.deviceHeight * 0.07,borderRadius:25, backgroundColor:'#2375fd'}}>
                 <Icon name={"wallet"}  style={{alignSelf:"center",}} color={"white"}  size={30}/>
                 </View>
             </View>
-            <View>
-                <View style={{ width: Scales.deviceWidth * 0.65, alignItems: "flex-end", flexDirection: "row",  }}>
+            <View style={{paddingLeft:13}}>
+                <View style={{ width:Scales.deviceWidth*0.40,alignItems: "center", flexDirection: "row",  }}>
                     <View style={{ justifyContent: "center", width: Scales.deviceWidth * 0.35 }}>
-                        <Text style={{}}>{data.transaction_description}</Text>
+                        <Text style={{fontSize:16,textTransform:"capitalize"}}>{data.transaction_description}</Text>
                     </View>
-                    <View style={{ justifyContent: "center" }}>
-                        <Text style={{ textAlign: "center", alignSelf: "flex-end", }}>{data.amount}</Text>
+                    <View style={{ justifyContent: "center",width:Scales.deviceWidth*0.35,  }}>
+                        <Text style={{ textAlign: "right",fontSize:12,paddingRight:Scales.deviceWidth*0.05, alignSelf: "flex-end", color:Math.sign(data.amount)==-1?"red":"green" }}>{"Rs." + data.amount}</Text>
                     </View>
                 </View>
-                <View style={{ width: Scales.deviceWidth * 0.65, flexDirection: "row",  alignItems: "flex-end" }}>
-                    <Text style={{paddingTop:3}}>{data.transaction_id}</Text>
+                <View style={{  flexDirection: "row",  alignItems: "center" }}>
+                    <Text style={{fontSize:12,color:"#676767",paddingTop:10}}>{data.wallet_transaction_id}</Text>
 
                 </View>
-                <View style={{ width: Scales.deviceWidth * 0.65, flexDirection: "row", alignItems: "flex-end" }}>
+                <View style={{  flexDirection: "row", alignItems: "center" }}>
                     <View style={{ justifyContent: "center", width: Scales.deviceWidth * 0.35, }}>
-                        <Text style={{}}>{data.updated_at.slice(0, 10)}</Text>
+                        <Text style={{fontSize:12,color:"#676767"}}>{data.updated_at.slice(0, 10)}</Text>
                     </View>
                     <View style={{ justifyContent: "center" ,}}>
-                        <Text style={{ textAlign: "center" }}>{data.running_raw_balance}</Text>
+                        <Text style={{ textAlign: "center",color:"#676767",fontSize:12, }}>Balance: Rs.{data.running_raw_balance}</Text>
                     </View>
                 </View>
             </View>
